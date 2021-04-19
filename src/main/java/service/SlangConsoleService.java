@@ -46,7 +46,7 @@ public class SlangConsoleService implements SlangWordService {
     }
 
     private List<SlangWord> getList() {
-        List<SlangWord> words = new ArrayList<>(this.dic.size());
+        List<SlangWord> words = new ArrayList<>();
         this.dic.forEach((d, v) -> words.add(new SlangWord(d, v)));
         return words;
     }
