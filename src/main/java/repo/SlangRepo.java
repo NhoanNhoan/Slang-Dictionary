@@ -1,9 +1,12 @@
 package repo;
 
+import entity.SlangWord;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
 public interface SlangRepo {
-    List<String> read(String path) throws IOException;
-   boolean write(String path);
+    List<SlangWord> Load() throws IOException;
+    boolean Save(List<SlangWord> words) throws IOException;
 }

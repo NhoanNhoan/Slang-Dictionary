@@ -1,0 +1,20 @@
+cluster:
+  id: ""
+  active_bootstrap_key: ""
+  token: ""
+  url: ""
+  port: ""
+  api_base_path: ""
+  api_nodes_path: ""
+  api_register_path: ""
+  certificates:
+    path: ""
+    fetched: false
+  name: ""
+  description: ""
+service_discovery:
+  consuls: []
+name: bright_ghoul
+bootstrap_key: ""
+mode: single
+status: ""

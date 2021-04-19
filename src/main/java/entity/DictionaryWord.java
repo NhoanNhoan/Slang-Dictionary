@@ -1,6 +1,9 @@
 package entity;
 
 public abstract class DictionaryWord {
+    private String definition;
+    private String value;
+
     public String getDefinition() {
         return definition;
     }
@@ -17,9 +20,6 @@ public abstract class DictionaryWord {
         this.value = value;
     }
 
-    private String definition;
-    private String value;
-
     public boolean make(String content, String delimiter) {
         var values = content.split(delimiter);
         if (0 != values.length) {
@@ -30,6 +30,8 @@ public abstract class DictionaryWord {
         this.value = values[1];
         return true;
     }
+
+    public DictionaryWord() {}
 
     public DictionaryWord(String definition, String value) {
         this.definition = definition;
