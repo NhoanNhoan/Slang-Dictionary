@@ -5,10 +5,7 @@ import repo.SlangRepo;
 import repo.textfile.SlangTextRepo;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class SlangConsoleService implements SlangWordService {
     private HashMap<String, String> dic;
@@ -17,6 +14,17 @@ public class SlangConsoleService implements SlangWordService {
     public SlangConsoleService(String path) throws IOException {
         this.repo = new SlangTextRepo(path);
         this.dic = new HashMap<>();
+    }
+
+    public String getDefinition(String slang) {
+        return this.dic.get(slang);
+    }
+
+    public SlangWord random() {
+        Random generator = new Random();
+        Object[] values = this.dic.keySet().toArray(new String[0]);
+        String randomValue = values[generator.nextInt(values.length)].toString();
+        return new SlangWord(randomValue, this.dic.get(randomValue));
     }
 
     @Override
