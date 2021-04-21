@@ -1,40 +1,28 @@
 package entity;
 
+import java.util.List;
+
 public abstract class DictionaryWord {
-    private String definition;
-    private String value;
-
-    public String getDefinition() {
-        return definition;
-    }
-
-    public void setDefinition(String definition) {
-        this.definition = definition;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public boolean make(String content, String delimiter) {
-        var values = content.split(delimiter);
-        if (0 != values.length) {
-            return false;
-        }
-
-        this.definition = values[0];
-        this.value = values[1];
-        return true;
-    }
+    private String word;
+    private List<String> definitions;
+    public static DictionaryWord NOWORD;
 
     public DictionaryWord() {}
 
-    public DictionaryWord(String definition, String value) {
-        this.definition = definition;
-        this.value = value;
+    public DictionaryWord(String word, List<String> definitions) {
+        this.word = word;
+        this.definitions = definitions;
+    }
+
+    public String getWord() {
+        return word;
+    }
+
+    public List<String> getDefinitions() {
+        return definitions;
+    }
+
+    public void addDefinition(String definition) {
+        definitions.add(definition);
     }
 }

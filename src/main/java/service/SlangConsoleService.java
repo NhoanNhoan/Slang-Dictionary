@@ -8,8 +8,9 @@ import java.io.IOException;
 import java.util.*;
 
 public class SlangConsoleService implements SlangWordService {
-    private HashMap<String, String> dic;
+    private HashMap<String, List<String>> dic;
     private SlangRepo repo;
+    public static List<String> NO_DEFINITIONS;
 
     public SlangConsoleService(String path) throws IOException {
         this.repo = new SlangTextRepo(path);
@@ -20,6 +21,13 @@ public class SlangConsoleService implements SlangWordService {
         return this.dic.get(slang);
     }
 
+    public List<String> search(String word) {
+        if (!existsWord(word)) {
+            return NO_DEFINITIONS;
+        }
+        return dic.get(word);
+    }
+
     public SlangWord random() {
         Random generator = new Random();
         Object[] values = this.dic.keySet().toArray(new String[0]);
@@ -28,13 +36,13 @@ public class SlangConsoleService implements SlangWordService {
     }
 
     @Override
-    public boolean exists(SlangWord word) {
-        return this.dic.get(word.getDefinition()) != null;
+    public boolean existsWord(String word) {
+        return this.dic.get(word) != null;
     }
 
     @Override
     public boolean insert(SlangWord... words) throws IOException {
-        Arrays.stream(words).forEach(w -> this.dic.put(w.getDefinition(), w.getValue()));
+        Arrays.stream(words).forEach(w -> this.dic.put(w.getDefinition(), w.getDefinition()));
         return repo.Save(this.getList());
     }
 

@@ -18,7 +18,7 @@ public class SlangWordHashMap {
 
     public boolean add(DictionaryWord word) {
         if (null != word) {
-            this.slangDic.put(word.getDefinition(), word.getValue());
+            this.slangDic.put(word.getDefinition(), word.getDefinition());
             return true;
         }
         return false;

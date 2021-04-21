@@ -1,6 +1,7 @@
 package delivery;
 
 import entity.SlangWord;
+import service.ReverseDic;
 import service.SlangConsoleService;
 
 import java.io.IOException;
@@ -10,11 +11,13 @@ import java.util.Scanner;
 
 public class SlangConsole {
     private SlangConsoleService service;
+    private ReverseDic reverseDic;
     private List<String> historySearch;
     private Scanner input;
 
     public SlangConsole(String path) throws IOException {
         this.service = new SlangConsoleService(path);
+        this.reverseDic = new ReverseDic();
         this.input = new Scanner(System.in);
         this.historySearch = new ArrayList<>();
     }
@@ -28,6 +31,9 @@ public class SlangConsole {
     }
 
     private void HandleSearchDefinition() {
+        System.out.println("-> definition: ");
+        String definition = this.input.nextLine();
+        String result = this.reverseDic.search(definition);
 
     }
 
@@ -81,7 +87,7 @@ public class SlangConsole {
 
     private void HandleRandomSlangWord() {
         var word = this.service.random();
-        System.out.println("Random word: " + word.getDefinition() + ": " + word.getValue());
+        System.out.println("Random word: " + word.getDefinition() + ": " + word.getDefinition());
     }
 
     private void HandleQuizByValue() {

@@ -1,7 +1,6 @@
 package repo.textfile;
 
 import entity.SlangWord;
-import entity.SlangWordHashMap;
 import repo.SlangRepo;
 
 import java.io.*;
@@ -22,7 +21,7 @@ public class SlangTextRepo implements SlangRepo {
         String delimiter = "``";
         String value = null;
         while ((value = reader.readLine()) != null) {
-            var word = SlangWord.makeByString(value, delimiter);
+            var word = SlangWord.parse(value, delimiter);
             content.add(word);
         }
 
@@ -35,7 +34,9 @@ public class SlangTextRepo implements SlangRepo {
         BufferedWriter writer = new BufferedWriter(new FileWriter(this.path));
         words.forEach(word -> {
             try {
-                writer.write(word.getDefinition() + "``" + word.getValue());
+                for (var definition : word.getDefinitions()) {
+                    writer.write(word.getWord() + "``" + definition);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
