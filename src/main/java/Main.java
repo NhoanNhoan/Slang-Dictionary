@@ -1,34 +1,16 @@
-import repo.textfile.SlangTextRepo;
+import service.SlangWordService;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.io.IOException;
 
 public class Main {
-    public static void main(String[] argv)
-    {
-       HashMap<Character, Object> values = new HashMap<>();
-        String content = "abc";
-        String data = "XYZ";
-        var curMap = values;
+    public static void main(String[] argv) throws IOException {
+        SlangWordService service = new SlangWordService("/home/nhandba/Documents/Slang-Dictionary/src/slang.txt");
+        long startTime = System.nanoTime();
 
-        for (var i = 0; i < content.length() - 1; i++) {
-            var map = new HashMap<Character, Object>();
-            curMap.put(content.charAt(i), map);
-            curMap = map;
-        }
+        System.out.println(service.searchByDefinition("No"));
+        long endTime = System.nanoTime();
 
-        curMap.put(content.charAt(content.length() - 1), data);
-        System.out.println(searchData(values, content));
-    }
-
-    static String searchData(HashMap<Character, Object> values, String word) {
-        var cur = values;
-        for (var i = 0; i < word.length() - 1; i++) {
-            cur = (HashMap<Character, Object>) cur.get(word.charAt(i));
-        }
-        return (String) cur.get(word.charAt(word.length() - 1));
+        long duration = (endTime - startTime);
+        System.out.println((float)duration / 1000000 + "ms");
     }
 }

@@ -18,7 +18,7 @@ public class SlangTextRepo implements SlangRepo {
     public List<SlangWord> Load() throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(this.path));
         List<SlangWord> content = new ArrayList<>();
-        String delimiter = "``";
+        String delimiter = "`";
         String value = null;
         while ((value = reader.readLine()) != null) {
             var word = SlangWord.parse(value, delimiter);
@@ -35,7 +35,7 @@ public class SlangTextRepo implements SlangRepo {
         words.forEach(word -> {
             try {
                 for (var definition : word.getDefinitions()) {
-                    writer.write(word.getWord() + "``" + definition);
+                    writer.write(word.getWord() + "`" + definition);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

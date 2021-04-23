@@ -15,10 +15,9 @@ public class SlangWord extends DictionaryWord {
     public static SlangWord parse(String content, String delim) {
         var values = content.split(delim);
         if (0 == values.length) {return null;}
-
-        var definitions = new ArrayList<String>(values.length - 1);
+        var definitions = new ArrayList<String>();
         for (var i = 1; i < values.length; i++) {
-            definitions.set(i - 1, values[i]);
+            definitions.add(values[i]);
         }
 
         return new SlangWord(values[0], definitions);
