@@ -12,4 +12,16 @@ public class Quiz {
         this.answer = answer;
         this.selections = selections;
     }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public List<String> getSelections() {
+        return selections;
+    }
+
+    public boolean isRightSelection(int selectionIndex) {
+        return answer == selections.get(selectionIndex);
+    }
 }

@@ -1,5 +1,6 @@
-package service;
+package service.interfaces;
 
+import entity.DictionaryWord;
 import entity.SlangWord;
 
 import java.io.IOException;
@@ -11,4 +12,5 @@ public interface DictionaryWordService {
     boolean update(SlangWord... words);
     boolean delete(SlangWord... words);
     List<SlangWord> fetch() throws IOException;
+    DictionaryWord randomWord();
 }

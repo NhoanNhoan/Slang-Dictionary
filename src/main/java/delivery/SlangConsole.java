@@ -1,6 +1,8 @@
 package delivery;
 
 import entity.SlangWord;
+import service.Quiz;
+import service.SlangWordQuiz;
 import service.SlangWordService;
 
 import java.io.IOException;
@@ -87,15 +89,35 @@ public class SlangConsole {
     }
 
     private void HandleRandomSlangWord() {
-        var word = this.service.random();
-        System.out.println("Random word: " + word.getWord() + ": " + word.getDefinitions());
+        var word = this.service.randomWord();
+        System.out.println("Word: " + word.getWord() + "Definitions: " + word.getDefinitions());
     }
 
     private void HandleQuizByValue() {
-
+        SlangWordQuiz challenge = new SlangWordQuiz(4, this.service);
+        var quiz = challenge.quizByWord();
+        HandleQuiz(quiz);
     }
 
     private void HandleQuizByDefinition() {
+        SlangWordQuiz challenge = new SlangWordQuiz(4, this.service);
+        var quiz = challenge.quizByDefinition();
+        HandleQuiz(quiz);
+    }
 
+    private void HandleQuiz(Quiz quiz) {
+        System.out.println(quiz.getQuestion());
+        System.out.println("Selection");
+
+        for (var i = 0; i < quiz.getSelections().size(); i++) {
+            System.out.println(i + 1 + quiz.getSelections().get(i));
+        }
+
+        int userSelection = this.input.nextInt();
+        if (!quiz.isRightSelection(userSelection)) {
+            System.out.println("Wrong");
+        } else {
+            System.out.println("Right! Congratulate!");
+        }
     }
 }

@@ -5,6 +5,7 @@ import repo.SlangRepo;
 import repo.textfile.SlangTextRepo;
 import service.ds.Trie;
 import service.interfaces.DictionarySearching;
+import service.interfaces.DictionaryWordService;
 
 import java.io.IOException;
 import java.util.*;
@@ -47,6 +48,7 @@ public class SlangWordService implements DictionaryWordService, DictionarySearch
         return trie.search(definition);
     }
 
+    @Override
     public SlangWord randomWord() {
         Random generator = new Random();
         Object[] values = this.dic.keySet().toArray(new String[0]);
