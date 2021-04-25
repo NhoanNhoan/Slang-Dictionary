@@ -17,7 +17,6 @@ public class SlangWordService implements DictionaryWordService, DictionarySearch
     private SlangRepo repo;
     public Trie trie;
 
-
     private interface Execution {
         boolean execute(SlangWord word);
     }
@@ -36,6 +35,10 @@ public class SlangWordService implements DictionaryWordService, DictionarySearch
 
     public List<String> search(String word) {
         return exists(word) ? dic.get(word) : NO_DEFINITIONS;
+    }
+
+    public void addDefinitionToTrie(String word, String slang) {
+        trie.insertSentence(word, slang);
     }
 
     @Override
@@ -64,12 +67,16 @@ public class SlangWordService implements DictionaryWordService, DictionarySearch
         return definitions.get(generator.nextInt(definitions.size()));
     }
 
-    private boolean execute(Execution exe, SlangWord... words) {
+    private boolean execute(Execution exe, SlangWord... words) throws IOException {
         for (var word : words) {
             if (!exe.execute(word)) {
                 return false;
             }
         }
+
+        List<SlangWord> slangWords = new ArrayList<>();
+        Arrays.stream(this.dic.keySet().toArray()).forEach(k -> slangWords.add(new SlangWord((String) k, this.dic.get(k))));
+        this.repo.Save(slangWords);
 
         return true;
     }
@@ -85,12 +92,12 @@ public class SlangWordService implements DictionaryWordService, DictionarySearch
     }
 
     @Override
-    public boolean update(SlangWord... words) {
-        return execute(w -> !exists(w.getWord()) && dic.put(w.getWord(), w.getDefinitions()) != null, words);
+    public boolean update(SlangWord... words) throws IOException {
+        return execute(w -> exists(w.getWord()) && dic.replace(w.getWord(), w.getDefinitions()) != null, words);
     }
 
     @Override
-    public boolean delete(SlangWord... words) {
+    public boolean delete(SlangWord... words) throws IOException {
         return execute(w -> !exists(w.getWord()) && dic.remove(w.getWord()) != null, words);
     }
 

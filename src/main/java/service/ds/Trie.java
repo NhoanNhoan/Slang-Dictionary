@@ -1,17 +1,14 @@
 package service.ds;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Trie
 {
     // Define the alphabet size (26 characters for `a – z`)
     private static final int CHAR_SIZE = 128;
 
-    private List<String> words;
     private boolean isLeaf;
+    private final List<String> words;
     private List<Trie> children = null;
 
     // Constructor
@@ -29,11 +26,17 @@ public class Trie
 
         for (var word : dic.keySet()) {
             for (var meaning : dic.get(word)) {
-                for (var key : meaning.split(" ")) {
-                    insert(key, word);
-                }
+                insertSentence(meaning, word);
             }
         }
+    }
+
+    public void insertSentence(String sentence, String keyWord) {
+        var words = sentence.split(" ");
+        if (1 != words.length) {
+            insert(sentence, keyWord);
+        }
+        Arrays.stream(words).forEach(word -> insert(word, keyWord));
     }
 
     // Iterative function to insert a string into a Trie
