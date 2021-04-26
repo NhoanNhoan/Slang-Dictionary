@@ -35,7 +35,7 @@ public class SlangTextRepo implements SlangRepo {
         words.forEach(word -> {
             try {
                 for (var definition : word.getDefinitions()) {
-                    writer.write(word.getWord() + "`" + definition);
+                    writer.write(word.getWord() + "`" + definition + "\n");
                 }
             } catch (IOException e) {
                 e.printStackTrace();

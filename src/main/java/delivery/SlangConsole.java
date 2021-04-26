@@ -26,7 +26,7 @@ public class SlangConsole {
                 "Quiz slang word.",
                 "Quiz by definition.",
                 "Stop.");
-        this.functions = new (path);
+        this.functions = new ConsoleService(path);
         var executions = new HashMap<Integer, Execution>();
 
         executions.put(1, new Execution() {
@@ -71,21 +71,21 @@ public class SlangConsole {
             }
         });
 
-        executions.put(7, new Execution() {
+        executions.put(8, new Execution() {
             @Override
             public void execute() {
                 functions.HandleRandomSlangWord();
             }
         });
 
-        executions.put(8, new Execution() {
+        executions.put(9, new Execution() {
             @Override
             public void execute() {
-                functions.HandleQuizByValue();
+                functions.HandleQuizBySlang();
             }
         });
 
-        executions.put(9, new Execution() {
+        executions.put(10, new Execution() {
             @Override
             public void execute() {
                 functions.HandleQuizByDefinition();
@@ -165,6 +165,7 @@ class ConsoleService {
             return;
         }
 
+        System.out.println("Definitions: ");
         definitions.forEach(d -> System.out.println("-> " + d));
     }
 
@@ -184,6 +185,10 @@ class ConsoleService {
         System.out.println("Enter:");
         System.out.print("-> Slang: ");
         String slang = this.input.nextLine();
+
+        if (this.service.exists(slang)) {
+
+        }
 
         System.out.println("-> Definition: ");
         String definition = this.input.nextLine();
@@ -210,6 +215,29 @@ class ConsoleService {
         System.out.println(this.service.update(new SlangWord(slang, listDefinition)) ? "Success" : "Fail");
     }
 
+    private boolean HandleExists(String slang) throws IOException {
+        System.out.println("This word has been existed!");
+        System.out.println("Overwrite(o) or duplicate(d) or no(n)");
+        String userInput = this.input.nextLine();
+
+        System.out.print("-> definition: ");
+        String definition = this.input.nextLine();
+
+        if (userInput.toLowerCase().equals("o")) {
+            return service.addDefinition(
+                            new SlangWord(slang,
+                            Collections.singletonList(definition)));
+        }
+
+        if (userInput.toLowerCase().equals("d")) {
+            return service.update(
+                    new SlangWord(slang,
+                    Collections.singletonList(definition)));
+        }
+
+        return userInput.toLowerCase().equals("n");
+    }
+
     public void HandleDelete() throws IOException {
         System.out.println("Enter: ");
         System.out.print("-> slang: ");
@@ -228,10 +256,11 @@ class ConsoleService {
 
     public void HandleRandomSlangWord() {
         var word = this.service.randomWord();
-        System.out.println("Word: " + word.getWord() + "Definitions: " + word.getDefinitions());
+        System.out.println("Word: " + word.getWord());
+        showList(word.getDefinitions());
     }
 
-    public void HandleQuizByValue() {
+    public void HandleQuizBySlang() {
         SlangWordQuiz challenge = new SlangWordQuiz(4, this.service);
         var quiz = challenge.quizByWord();
         HandleQuiz(quiz);
@@ -244,15 +273,16 @@ class ConsoleService {
     }
 
     private void HandleQuiz(Quiz quiz) {
-        System.out.println(quiz.getQuestion());
-        System.out.println("Selection");
+        System.out.println("What is '" + quiz.getQuestion() + "'?");
 
         for (var i = 0; i < quiz.getSelections().size(); i++) {
-            System.out.println(i + 1 + quiz.getSelections().get(i));
+            System.out.println(i + 1 + ". " + quiz.getSelections().get(i));
         }
 
+        System.out.println("Select:");
+
         int userSelection = this.input.nextInt();
-        if (!quiz.isRightSelection(userSelection)) {
+        if (!quiz.isRightSelection(userSelection - 1)) {
             System.out.println("Wrong");
         } else {
             System.out.println("Right! Congratulate!");

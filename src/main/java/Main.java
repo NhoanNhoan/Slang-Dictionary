@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] argv) throws IOException {
-        var console = new SlangConsole("D:/slang.txt");
+        var console = new SlangConsole("/home/nhandba/slang.txt");
         console.Run();
     }
 }

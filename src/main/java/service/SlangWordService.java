@@ -61,10 +61,10 @@ public class SlangWordService implements DictionaryWordService, DictionarySearch
 
     public String randomDefinition() {
         Random generator = new Random();
-        Object[] values = this.dic.values().toArray();
+        var values = this.dic.values().toArray();
         int randomValueIdx = generator.nextInt(values.length);
-        List<String> definitions = (List<String>) values[randomValueIdx];
-        return definitions.get(generator.nextInt(definitions.size()));
+        var definitions = values[randomValueIdx];
+        return definitions.toString();
     }
 
     private boolean execute(Execution exe, SlangWord... words) throws IOException {
@@ -88,7 +88,7 @@ public class SlangWordService implements DictionaryWordService, DictionarySearch
 
     @Override
     public boolean insert(SlangWord... words) throws IOException {
-        return execute(w -> !exists(w.getWord()) && dic.put(w.getWord(), w.getDefinitions()) != null, words);
+        return execute(w -> !exists(w.getWord()) && dic.put(w.getWord(), w.getDefinitions()) == null, words);
     }
 
     @Override
@@ -98,12 +98,16 @@ public class SlangWordService implements DictionaryWordService, DictionarySearch
 
     @Override
     public boolean delete(SlangWord... words) throws IOException {
-        return execute(w -> !exists(w.getWord()) && dic.remove(w.getWord()) != null, words);
+        return execute(w -> exists(w.getWord()) && dic.remove(w.getWord()) != null, words);
     }
 
     @Override
     public List<SlangWord> fetch() throws IOException {
         return this.repo.Load();
+    }
+
+    public boolean addDefinition(SlangWord word) {
+        return this.dic.get(word.getWord()).addAll(word.getDefinitions());
     }
 
     private List<SlangWord> getList() {
