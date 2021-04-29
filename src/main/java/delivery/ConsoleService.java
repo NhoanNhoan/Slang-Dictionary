@@ -15,6 +15,7 @@ class ConsoleService {
     private SlangWordService service;
     private List<String> historySearch;
     private Scanner input;
+    private ConsoleIO io;
 
     public ConsoleService(String path) throws IOException {
         this.service = new SlangWordService(path);
@@ -53,27 +54,41 @@ class ConsoleService {
     }
 
     public void HandleInsert() throws IOException {
-        System.out.println("Enter:");
-        System.out.print("-> Slang: ");
-        String slang = this.input.nextLine();
-
+        String slang = this.io.enterString("-> Enter slang: ");
+        String meaning = this.io.enterString("-> Enter definition: ");
+        var word = new SlangWord(slang, Collections.singletonList(meaning));
         if (this.service.exists(slang)) {
-            if (HandleExists(slang)) {
-                System.out.println("Success");
-            } else {
-                System.out.println("Fail");
-            }
-
+            this.io.display("Success", "Fail", HandleExists(slang));
             return;
         }
 
-        System.out.println("-> Definition: ");
-        String definition = this.input.nextLine();
-
-        var word = new SlangWord(slang, Collections.singletonList(definition));
-        var msg = this.service.insert(word) ? "Success" : "Fail";
+        this.io.display("Success", "Fail", this.service.insert(word));
         this.service.addDefinitionToTrie(definition, slang);
         System.out.println(msg);
+    }
+
+    private boolean HandleExists(String slang) throws IOException {
+        System.out.println("This slang has been existed!");
+        System.out.println("Overwrite(o) or duplicate(d) or no(n)");
+        String userInput = this.input.nextLine();
+
+        if (userInput.toLowerCase().equals("o")) {
+            return service.update(
+                    new SlangWord(slang,
+                            Collections.singletonList(definition)));
+        }
+
+        if (userInput.toLowerCase().equals("d")) {
+            return service.addDefinition(
+                    new SlangWord(slang,
+                            Collections.singletonList(definition)));
+        }
+
+        return userInput.toLowerCase().equals("n");
+    }
+
+    private boolean HandleInsertNonExists(String slag) {
+
     }
 
     public void HandleEdit() throws IOException {
@@ -90,29 +105,6 @@ class ConsoleService {
         var listDefinition = new ArrayList<String>(){{add(definition);}};
 
         System.out.println(this.service.update(new SlangWord(slang, listDefinition)) ? "Success" : "Fail");
-    }
-
-    private boolean HandleExists(String slang) throws IOException {
-        System.out.println("This word has been existed!");
-        System.out.println("Overwrite(o) or duplicate(d) or no(n)");
-        String userInput = this.input.nextLine();
-
-        System.out.print("-> definition: ");
-        String definition = this.input.nextLine();
-
-        if (userInput.toLowerCase().equals("o")) {
-            return service.update(
-                    new SlangWord(slang,
-                            Collections.singletonList(definition)));
-        }
-
-        if (userInput.toLowerCase().equals("d")) {
-            return service.addDefinition(
-                    new SlangWord(slang,
-                            Collections.singletonList(definition)));
-        }
-
-        return userInput.toLowerCase().equals("n");
     }
 
     public void HandleDelete() throws IOException {
@@ -164,5 +156,32 @@ class ConsoleService {
         } else {
             System.out.println("Right! Congratulate!");
         }
+    }
+}
+
+class ConsoleIO {
+    private Scanner scanner;
+
+    public ConsoleIO() {
+        this.scanner = new Scanner(System.in);
+    }
+
+    public void display(String msg) {
+        System.out.print(msg);
+    }
+
+    public void display(String success, String fail, boolean right) {
+        String msg = right ? success : fail;
+        this.display(msg);
+    }
+
+    public String enterString(String msg) {
+        this.display(msg);
+        return this.scanner.nextLine();
+    }
+
+    public Integer enterInt(String msg) {
+        this.display(msg);
+        return this.scanner.nextInt();
     }
 }
