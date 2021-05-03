@@ -1,7 +1,7 @@
-package delivery;
+package entity;
 
 import java.io.IOException;
 
-interface Execution {
+public interface Execution {
     void execute() throws IOException;
 }

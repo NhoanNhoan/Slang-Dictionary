@@ -1,7 +1,8 @@
 package delivery;
 
+import delivery.io.ConsoleIO;
 import entity.SlangWord;
-import service.Quiz;
+import entity.Quiz;
 import service.SlangWordQuiz;
 import service.SlangWordService;
 
@@ -9,179 +10,132 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 class ConsoleService {
-    private SlangWordService service;
-    private List<String> historySearch;
-    private Scanner input;
-    private ConsoleIO io;
+    private final ConsoleIO io;
+    private final SlangWordService service;
+    private final List<String> history;
 
     public ConsoleService(String path) throws IOException {
         this.service = new SlangWordService(path);
-        this.input = new Scanner(System.in);
-        this.historySearch = new ArrayList<>();
+        this.history = new ArrayList<>();
+        this.io = new ConsoleIO();
     }
 
     public void HandleSearchSlang() {
-        System.out.print("-> Enter slang: ");
-        String word = this.input.nextLine();
-        List<String> definitions = this.service.search(word);
-        showList(definitions);
-        this.historySearch.add(word);
-    }
-
-    private void showList(List<String> definitions) {
-        if (null == definitions) {
-            System.out.println("Not found");
-            return;
-        }
-
-        System.out.println("Definitions: ");
-        definitions.forEach(d -> System.out.println("-> " + d));
+        var slang = io.enterString("-> Enter slang: ");
+        List<String> definitions = service.searchByWord(slang);
+        io.displaySlangDefinitions(definitions);
+        this.history.add(slang);
     }
 
     public void HandleSearchDefinition() {
-        System.out.print("-> definition: ");
-        String definition = this.input.nextLine();
-        var result = this.service.searchByDefinition(definition);
-        showList(result);
+        var word = this.io.enterString("-> Enter definition: ");
+        var result = this.service.searchByDefinition(word);
+        if (null == result || result.isEmpty()) {
+            io.display("\nNo result!!!\n\n");
+            return;
+        }
+
+        io.display("\n* Related words:\n");
+        for (var value : result) {
+            io.display("\t# " + value + ":\n");
+            service.searchByWord(value).forEach(e -> io.display("\t\t- " + e + "\n"));
+            io.display("------------------------------------------------------------\n");
+        }
     }
 
     public void HandleShowHistory() {
-        System.out.println("Searching history: ");
-        this.historySearch.forEach(w -> System.out.println("-> " + w));
+        System.out.println("\nSearching history: ");
+        this.history.forEach(w -> io.display("- " + w + "\n"));
+        io.display("\n\n");
     }
 
     public void HandleInsert() throws IOException {
         String slang = this.io.enterString("-> Enter slang: ");
         String meaning = this.io.enterString("-> Enter definition: ");
-        var word = new SlangWord(slang, Collections.singletonList(meaning));
-        if (this.service.exists(slang)) {
-            this.io.display("Success", "Fail", HandleExists(slang));
-            return;
-        }
+        var word = new SlangWord(slang, new ArrayList<String>() {{add(meaning);}});
 
-        this.io.display("Success", "Fail", this.service.insert(word));
-        this.service.addDefinitionToTrie(definition, slang);
-        System.out.println(msg);
+        this.io.display("=> Success!\n\n", "=> Fail!\n\n",
+                service.exists(slang) && HandleExists(word) ||
+                this.service.insert(word));
+
+        this.service.addDefinitionToTrie(meaning, slang);
     }
 
-    private boolean HandleExists(String slang) throws IOException {
-        System.out.println("This slang has been existed!");
-        System.out.println("Overwrite(o) or duplicate(d) or no(n)");
-        String userInput = this.input.nextLine();
+    private boolean HandleExists(SlangWord word) throws IOException {
+        String userInput = this.io.enterString(
+                "-> this word has been existed!\n" +
+                "-> Overwrite(o) or duplicate(d) or no(n):");
 
-        if (userInput.toLowerCase().equals("o")) {
-            return service.update(
-                    new SlangWord(slang,
-                            Collections.singletonList(definition)));
+        if (userInput.equalsIgnoreCase("n")) {
+            return true;
         }
 
-        if (userInput.toLowerCase().equals("d")) {
-            return service.addDefinition(
-                    new SlangWord(slang,
-                            Collections.singletonList(definition)));
+        if (userInput.equalsIgnoreCase("o")) {
+            return service.update(word);
         }
 
-        return userInput.toLowerCase().equals("n");
-    }
-
-    private boolean HandleInsertNonExists(String slag) {
-
+        return (userInput.equalsIgnoreCase("d") && service.addDefinition(word));
     }
 
     public void HandleEdit() throws IOException {
-        System.out.println("Enter:");
-        System.out.print("-> slang: ");
-        String slang = this.input.nextLine();
+        String slang = this.io.enterString("-> Enter slang: ");
         if (!this.service.exists(slang)) {
-            System.out.println("Not found");
+            this.io.display("\nNo Result!\n\n");
             return;
         }
 
-        System.out.println("-> definition: ");
-        String definition = this.input.nextLine();
-        var listDefinition = new ArrayList<String>(){{add(definition);}};
-
-        System.out.println(this.service.update(new SlangWord(slang, listDefinition)) ? "Success" : "Fail");
+        String definition = this.io.enterString("-> definition: ");
+        var updated = service.update(new SlangWord(slang,
+                Collections.singletonList(definition)));
+        if (updated) {
+            this.io.display("\n=> Updated!\n\n");
+            service.reloadTrie();
+            return;
+        }
+        this.io.display("\n=> Fail!\n");
     }
 
     public void HandleDelete() throws IOException {
-        System.out.println("Enter: ");
-        System.out.print("-> slang: ");
-        String slang = this.input.nextLine();
+        var slang = this.io.enterString("-> Enter slang: ");
         if (!this.service.exists(slang)) {
-            System.out.println("Not found");
+            System.out.println("\n* No Result!\n");
             return;
         }
 
-        System.out.println(this.service.delete(new SlangWord(slang, null)) ? "Success" : "Fail");
+        System.out.println(this.service.delete(new SlangWord(slang, null)) ? "=> Deleted!\n" : "=> Fail!\n");
+        this.service.reloadTrie();
     }
 
-    public void HandleReset() {
-        this.historySearch.clear();
+    public void HandleReset() throws IOException {
+        this.history.clear();
+        this.service.reset();
+        io.display("\n=> Success!\n\n");
     }
 
     public void HandleRandomSlangWord() {
         var word = this.service.randomWord();
-        System.out.println("Word: " + word.getWord());
-        showList(word.getDefinitions());
+        io.display("* Word: " + word.getWord());
+        io.displaySlangDefinitions(word.getDefinitions());
     }
 
     public void HandleQuizBySlang() {
         SlangWordQuiz challenge = new SlangWordQuiz(4, this.service);
-        var quiz = challenge.quizByWord();
-        HandleQuiz(quiz);
+        HandleQuiz(challenge.quizByWord());
     }
 
     public void HandleQuizByDefinition() {
         SlangWordQuiz challenge = new SlangWordQuiz(4, this.service);
-        var quiz = challenge.quizByDefinition();
-        HandleQuiz(quiz);
+        HandleQuiz(challenge.quizByDefinition());
     }
 
     private void HandleQuiz(Quiz quiz) {
-        System.out.println("What is '" + quiz.getQuestion() + "'?");
-
-        for (var i = 0; i < quiz.getSelections().size(); i++) {
-            System.out.println(i + 1 + ". " + quiz.getSelections().get(i));
-        }
-
-        System.out.println("Select:");
-
-        int userSelection = this.input.nextInt();
-        if (!quiz.isRightSelection(userSelection - 1)) {
-            System.out.println("Wrong");
-        } else {
-            System.out.println("Right! Congratulate!");
-        }
-    }
-}
-
-class ConsoleIO {
-    private Scanner scanner;
-
-    public ConsoleIO() {
-        this.scanner = new Scanner(System.in);
-    }
-
-    public void display(String msg) {
-        System.out.print(msg);
-    }
-
-    public void display(String success, String fail, boolean right) {
-        String msg = right ? success : fail;
-        this.display(msg);
-    }
-
-    public String enterString(String msg) {
-        this.display(msg);
-        return this.scanner.nextLine();
-    }
-
-    public Integer enterInt(String msg) {
-        this.display(msg);
-        return this.scanner.nextInt();
+        io.display("What is '" + quiz.getQuestion() + "'?\n");
+        io.displayQuiz(quiz);
+        int selection = io.enterInt("-> Your answer: ");
+        io.display("=> Right! Congratulate!\n\n",
+                "=> Wrong! Result: " + quiz.getRightAnswer() + "\n\n",
+                quiz.isRightSelection(selection - 1));
     }
 }

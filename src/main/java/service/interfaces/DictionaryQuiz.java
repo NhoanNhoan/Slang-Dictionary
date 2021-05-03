@@ -1,6 +1,6 @@
 package service.interfaces;
 
-import service.Quiz;
+import entity.Quiz;
 
 public interface DictionaryQuiz {
     Quiz quizByWord();

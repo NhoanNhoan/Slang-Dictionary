@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
-class Menu {
+class GUI {
     private String[] selections;
 
-    public Menu(String ...selections) {
+    public GUI(String ...selections) {
         this.selections = selections;
     }
 

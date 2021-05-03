@@ -3,11 +3,9 @@ package entity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SlangWord extends DictionaryWord {
-    public SlangWord() {
-        super();
-    }
     public SlangWord(String word, List<String> definitions) {
         super(word, definitions);
     }
@@ -15,11 +13,13 @@ public class SlangWord extends DictionaryWord {
     public static SlangWord parse(String content, String delim) {
         var values = content.split(delim);
         if (0 == values.length) {return null;}
-        var definitions = new ArrayList<String>();
-        for (var i = 1; i < values.length; i++) {
-            definitions.add(values[i]);
+        if (values.length > 1) {
+            return new SlangWord(values[0], splitDefinitions(values[1]));
         }
+        return new SlangWord(values[0], null);
+    }
 
-        return new SlangWord(values[0], definitions);
+    private static List<String> splitDefinitions(String content) {
+        return Arrays.stream(content.split("\\|")).map(String::trim).collect(Collectors.toList());
     }
 }

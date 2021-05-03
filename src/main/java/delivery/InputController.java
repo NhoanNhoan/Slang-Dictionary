@@ -1,10 +1,12 @@
 package delivery;
 
+import entity.Execution;
+
 import java.io.IOException;
 import java.util.HashMap;
 
 class InputController {
-    private HashMap<Integer, Execution> executions;
+    private final HashMap<Integer, Execution> executions;
 
     public InputController(HashMap<Integer, Execution> executions) {
         this.executions = executions;

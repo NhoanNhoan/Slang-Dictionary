@@ -1,21 +1,17 @@
 package delivery;
 
-import entity.SlangWord;
-import service.Quiz;
-import service.SlangWordQuiz;
-import service.SlangWordService;
+import entity.Execution;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class SlangConsole {
-    private Menu menu;
+    private GUI menu;
     private InputController controller;
     private ConsoleService functions;
 
     public SlangConsole(String path) throws IOException {
-        this.menu = new Menu("Find slang word.",
+        this.menu = new GUI("Find slang word.",
                 "Find by definition.",
                 "Show history.",
                 "Insert.",
@@ -71,6 +67,13 @@ public class SlangConsole {
             }
         });
 
+        executions.put(7, new Execution() {
+            @Override
+            public void execute() throws IOException {
+                functions.HandleReset();
+            }
+        });
+
         executions.put(8, new Execution() {
             @Override
             public void execute() {
@@ -96,8 +99,9 @@ public class SlangConsole {
     }
 
     public void Run() throws IOException {
-        while (true) {
-            int selection = menu.receiveSelection();
+        int selection = 1;
+        while (selection > 0 && selection < 11) {
+            selection = menu.receiveSelection();
             controller.executeSelection(selection);
         }
     }

@@ -1,5 +1,7 @@
 package delivery;
 
+import entity.Execution;
+
 import java.io.IOException;
 
 public class BenchmarkExecution {

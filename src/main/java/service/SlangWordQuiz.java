@@ -1,5 +1,6 @@
 package service;
 
+import entity.Quiz;
 import service.interfaces.DictionaryQuiz;
 
 import java.util.ArrayList;
@@ -26,10 +27,10 @@ public class SlangWordQuiz implements DictionaryQuiz {
 
         Random generator = new Random();
         var idxRightSelection = generator.nextInt(numSelections);
-        selections.set(idxRightSelection, service.search(word).get(0));
+        selections.set(idxRightSelection, service.searchByWord(word).get(0));
 
         return new Quiz(word,
-                this.service.search(word).get(0),
+                this.service.searchByWord(word).get(0),
                 selections);
     }
 

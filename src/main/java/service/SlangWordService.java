@@ -1,6 +1,7 @@
 package service;
 
 import entity.SlangWord;
+import entity.SlangWordExecution;
 import repo.SlangRepo;
 import repo.textfile.SlangTextRepo;
 import service.ds.Trie;
@@ -8,18 +9,16 @@ import service.interfaces.DictionarySearching;
 import service.interfaces.DictionaryWordService;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class SlangWordService implements DictionaryWordService, DictionarySearching {
     public static List<String> NO_DEFINITIONS;
 
     private HashMap<String, List<String>> dic;
-    private SlangRepo repo;
+    private final SlangRepo repo;
     public Trie trie;
 
-    private interface Execution {
-        boolean execute(SlangWord word);
-    }
 
     public SlangWordService(String path) throws IOException {
         this.repo = new SlangTextRepo(path);
@@ -31,10 +30,6 @@ public class SlangWordService implements DictionaryWordService, DictionarySearch
         }
 
         trie = new Trie(dic);
-    }
-
-    public List<String> search(String word) {
-        return exists(word) ? dic.get(word) : NO_DEFINITIONS;
     }
 
     public void addDefinitionToTrie(String word, String slang) {
@@ -63,11 +58,11 @@ public class SlangWordService implements DictionaryWordService, DictionarySearch
         Random generator = new Random();
         var values = this.dic.values().toArray();
         int randomValueIdx = generator.nextInt(values.length);
-        var definitions = values[randomValueIdx];
-        return definitions.toString();
+        List<String> definitions = (List<String>) values[randomValueIdx];
+        return definitions.get(0);
     }
 
-    private boolean execute(Execution exe, SlangWord... words) throws IOException {
+    private boolean execute(SlangWordExecution exe, SlangWord... words) throws IOException {
         for (var word : words) {
             if (!exe.execute(word)) {
                 return false;
@@ -106,11 +101,28 @@ public class SlangWordService implements DictionaryWordService, DictionarySearch
         return this.repo.Load();
     }
 
+    public void reset() throws IOException {
+        var rootRepo = new SlangTextRepo("root.txt");
+        var list = rootRepo.Load();
+        this.dic = new HashMap<>();
+
+        for (var word : list) {
+            dic.put(word.getWord(), word.getDefinitions());
+        }
+
+        reloadTrie();
+        this.repo.Save(getListSlangWords());
+    }
+
+    public void reloadTrie() {
+        trie = new Trie(dic);
+    }
+
     public boolean addDefinition(SlangWord word) {
         return this.dic.get(word.getWord()).addAll(word.getDefinitions());
     }
 
-    private List<SlangWord> getList() {
+    private List<SlangWord> getListSlangWords() {
         List<SlangWord> words = new ArrayList<>();
         this.dic.forEach((d, v) -> words.add(new SlangWord(d, v)));
         return words;

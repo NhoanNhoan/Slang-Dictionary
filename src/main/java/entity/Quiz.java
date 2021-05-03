@@ -1,4 +1,4 @@
-package service;
+package entity;
 
 import java.util.List;
 
@@ -23,5 +23,9 @@ public class Quiz {
 
     public boolean isRightSelection(int selectionIndex) {
         return answer == selections.get(selectionIndex);
+    }
+
+    public String getRightAnswer() {
+        return this.answer;
     }
 }
